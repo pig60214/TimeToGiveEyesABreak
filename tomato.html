@@ -1,0 +1,125 @@
+<style>
+  h1 {
+    color: gray;
+    font-size: 10em;
+  }
+  h2 {
+    color: gray;
+  }
+  .container {
+    display: flex;
+  }
+  .half {
+    width: 50%;
+  }
+  .content-center {
+    text-align: center;
+  }
+
+  button {
+    border-radius: 0.5em;
+    background-color: rgb(63, 63, 63);
+    color: rgb(239, 239, 239);
+    font-size: 1.2em;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin: 0.5em;
+  }
+
+  input {
+    border-radius: 0.5em;
+    border: 1px solid gray;
+    padding: 10px;
+    margin: 0.5em;
+  }
+
+  .main{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 100%;
+  }
+</style>
+<body>
+  <div class="main">
+    <div class="container">
+      <div class="half content-center">
+        <h2>Working Time</h2>
+        <h1 id="timerForWorkingTime">00:00</h1>
+      </div>
+      <div class="half content-center">
+        <h2>Break Time</h2>
+        <h1 id="timerForBreakTime">00:00</h1>
+      </div>
+    </div>
+    <div class="content-center">
+      <button onclick="start()">START</button>
+      <div><input type="number" value="2" id="times"> Times</div>
+      <div id="remain">&nbsp;</div>
+    </div>
+  </div>
+</body>
+
+<script>
+
+const isTest = true;
+const workingSec = isTest ? 3 : 50*60;
+const breakSec = isTest ? 3 : 10*60;
+
+window.onload = function() {
+  setUpDisplay();
+}
+
+function start() {
+  const loopTimes = document.getElementById("times").value
+  loops(loopTimes);
+}
+
+function setUpDisplay() {
+  document.getElementById("timerForWorkingTime").innerHTML = formatTime(workingSec);
+  document.getElementById("timerForBreakTime").innerHTML = formatTime(breakSec);
+}
+
+async function loops(times) {
+  for(var i = 0; i < times; i++) {
+    document.getElementById("remain").innerHTML = `${i+1} / ${times}`;
+    await countdown(workingSec, "timerForWorkingTime");
+    await countdown(breakSec, "timerForBreakTime");
+    setUpDisplay();
+  }
+}
+
+function countdown(seconds, id) {
+  document.getElementById(id).style.color = "black";
+  return new Promise(function(resolve, reject) {
+    var interval = setInterval(function() {
+      if (seconds > 0) {
+        seconds--;
+        document.getElementById(id).innerHTML = formatTime(seconds);
+      } else {
+        document.getElementById(id).style.color = 'gray';
+        var audioFile = "7.mp3";
+        var audio = new Audio(audioFile);
+        audio.play();
+        clearInterval(interval);
+        resolve();
+      }
+    }, 1000);
+  });
+}
+
+function formatTime(seconds) {
+  let minutes = Math.floor(seconds / 60);
+  let remainingSeconds = seconds % 60;
+
+  if (minutes < 10) {
+    minutes = '0' + minutes;
+  }
+  if (remainingSeconds < 10) {
+    remainingSeconds = '0' + remainingSeconds;
+  }
+
+  return minutes + ':' + remainingSeconds;
+}
+</script>
